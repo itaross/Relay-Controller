@@ -1,0 +1,81 @@
+\hypertarget{classBoard}{
+\section{Board Class Reference}
+\label{classBoard}\index{Board@{Board}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classBoard_a9ee491d4fea680cf69b033374a9fdfcb}{Board} ()
+\item 
+std::string \hyperlink{classBoard_a9a9fa1f7e205e393ea212bc054be46be}{getFullInfo} ()
+\item 
+\hypertarget{classBoard_a4b43da27d4db4ba3a68b14f6db44c5ba}{
+std::string {\bfseries getType} ()}
+\label{classBoard_a4b43da27d4db4ba3a68b14f6db44c5ba}
+
+\item 
+\hypertarget{classBoard_aa2d9f8e5dc0702922ef58934ee2a6df8}{
+std::string {\bfseries getRevision} ()}
+\label{classBoard_aa2d9f8e5dc0702922ef58934ee2a6df8}
+
+\item 
+\hypertarget{classBoard_a43afe5e27039e3e66002902d43ce9ed7}{
+std::string {\bfseries getProgram} ()}
+\label{classBoard_a43afe5e27039e3e66002902d43ce9ed7}
+
+\item 
+\hypertarget{classBoard_a7db376119050a045e5a0146415232b4a}{
+int {\bfseries getNumberOfRelays} ()}
+\label{classBoard_a7db376119050a045e5a0146415232b4a}
+
+\item 
+\hypertarget{classBoard_ab2d78c3d5fe9ed9b53bc8621350219c1}{
+std::string {\bfseries getRelayState} ()}
+\label{classBoard_ab2d78c3d5fe9ed9b53bc8621350219c1}
+
+\item 
+\hypertarget{classBoard_a3da918c8ef7e98486c832be42a9d39d4}{
+int {\bfseries getRelayState} (int relay)}
+\label{classBoard_a3da918c8ef7e98486c832be42a9d39d4}
+
+\item 
+\hypertarget{classBoard_a5cc59ab93c04dc73969648439bde431a}{
+int {\bfseries getBoardTime} ()}
+\label{classBoard_a5cc59ab93c04dc73969648439bde431a}
+
+\item 
+\hypertarget{classBoard_aa3aca9c88882d7579eb63b586befbad0}{
+bool {\bfseries isConnected} ()}
+\label{classBoard_aa3aca9c88882d7579eb63b586befbad0}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classBoard_a9ee491d4fea680cf69b033374a9fdfcb}{
+\index{Board@{Board}!Board@{Board}}
+\index{Board@{Board}!Board@{Board}}
+\subsubsection[{Board}]{\setlength{\rightskip}{0pt plus 5cm}Board::Board (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classBoard_a9ee491d4fea680cf69b033374a9fdfcb}
+Constructor. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classBoard_a9a9fa1f7e205e393ea212bc054be46be}{
+\index{Board@{Board}!getFullInfo@{getFullInfo}}
+\index{getFullInfo@{getFullInfo}!Board@{Board}}
+\subsubsection[{getFullInfo}]{\setlength{\rightskip}{0pt plus 5cm}string Board::getFullInfo (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classBoard_a9a9fa1f7e205e393ea212bc054be46be}
+Returns a string containing all the information we have about the board : the number of relays on board, the bord time, it's type and revision, the program it has on board. Does NOT return the current ratings for the individual relays 
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+Board.h\item 
+Board.cpp\end{DoxyCompactItemize}

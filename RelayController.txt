@@ -1,0 +1,165 @@
+------------------------------------------------------------------------------
+
+				RelayController Software Specification
+
+------------------------------------------------------------------------------
+
+Index :
+	Objectives
+	High Level Description of the components
+	Features
+	Commands
+		Command Fromat
+		Available Commands
+	CLI App
+		Description
+		Development Milestones
+	Gui App
+		Description
+		Development Milestones
+	Embedded controller 
+		Description
+		Error Reporting mechanisms
+		Available Errors
+		Development Milestones
+	Commands File
+		Description
+		File Specification
+
+------------------------------------------------------------------------------
+
+--->Objectives : 
+	Develop a command client to control a relay board
+	Develop a GUI client to control a relay board
+	Develop the embedded code to actuate the relays
+
+--->Features :
+	Command Line interface for tethered mode and programming
+	Embedded Lua interpreter to build scripts
+	load scripts from board memory
+
+--> High Level Description of Components:
+	The client communicates with the board using a USB/serial connection. The uC has 2 modes : tethered and stand-alone. In tethered mode the uC simply interprets the commands sent to it through the USB/serial connection. In stand-alone mode the uC executes stored commands at defined moments in time.
+	Available commands will be : Switch on/off and toggle.These commands are preceded by a time qualifier : a unix epoch time stamp. Commands may also be set to repeat at regular intervals (eg. once every minute). 
+	
+--> Command format :
+	When in tethered mode the uC recieves commands directly from the PC these commands consist in hex characters. After recieving a command the uC controller must acknowledge the command. The PC will wait untili t recieves confirmation before sending anymore commands. To prevent useless waiting times the connection will timeout after a time tbd.
+	
+	As the communication between PC and uC is exclusively master/slave the	PC will periodically interrogate the uC to check that it's ok. If all is good the uC will repsond with ACK, else it will repond with NACK followed by an error code that describes the error. 	
+
+   --> Commands :
+    [repsonses]
+	\x00 -- unused
+	\x01 -- ACK - message recieved, all good
+	\x02 -- NACK - message recieved, unknown instruction
+	
+	[Error Codes]
+	\x10 -- relay already on/off - the instruction recieved was
+				redundant, the relay is already in the deisred state.   
+
+	[State requests]
+	\x40 -- BoardInfo - Sends Model name to the computer
+	\x41 -- Boardinfo_full - Sends Model name, number of relays, current 
+				ratings, and any other data to the PC
+	\x42 -- GetlocalTime - Sends the time according to the board to the PC
+	\x43 -- RelayState_all - send the state of all the relays on the board
+				to the computer
+	\x44 -- RelayState, followed by the id of the individual relay
+			   - Send the state of the specified relay to the PC
+	\x45 -- ReadProgram - Prompts the board to print it's programming data
+			    to the serial interface.
+
+	[State Commands]	
+	\x80 -- SetTime, followed by full time (day, month, year, hours, 
+			 minutes, seconds)
+		        - Resets the time on the board to the time on the PC
+	\x81 -- toggle, followed by id of the individual relay
+	\x81 -- Switch on, followed by id of the individual relay
+	\x82 -- Switch off, followed by id of the individual relay
+
+
+---> CLI App :
+	--> Description
+		This app presents a non interactive behaviour: when called it performs actions based on the parameters passed by the caller, waits for confirmation from the board and exits presenting any error messages it may have read to the user.	The app is meant to provide an interface to manually actuate the relays, read their states, read and reset the time if necessary, read any error messages from the uC and allow reading previously uploaded programs from the board as well as uploading new programs.
+
+	--> Command Line parameters	
+		-s, --shell : start an interactive lua shell to command the bord
+		-u, --upload-file : the next parameter is a filename. The file will
+				be uploaded to the board if it is a valid command file
+				Otherwise if the file is a lua script the script will be run
+				, it's output checked for compliance with the command format
+				and then uploaded
+		-c, --check-file : the next parameter is a filename, The file will 
+				be checked for compliance with the command format and any 
+				errors will be displayed to the user.
+		-b, --boardinfo : the program will prompt the board for details 
+				about it's configuration and display them to the user.
+		-r, --relay-state : the program will prompt the board for the state 
+				of the specified relay.
+		-p, --port : the serial port the board is connected to.
+		
+		for -b, -r, -u abort if -p is absent.
+		for -s, warn that -p is absent.
+
+	--> Development Milestones :
+		v0.0.1 - Read Command Line parameters, Parse command files for errors
+		v0.0.2 - Compile command files
+		v0.1.0 - Allow reading the state of the board (time, info, relays)
+		v0.1.1 - Allow simple toggle and set commands
+		v0.1.2 - Allow uploading handmade command files to the board
+		v0.2.0 - Embedded Lua interpreter builds command files that can be
+		         be uploaded to the board
+
+---> GUI App :
+
+---> Embedded Controller :
+	--> Program Description:
+		The program reads a line from memory and fetches the time from the	RTC. If the time the command was supposed to be run is passed the board logs the failure and if the timeout period has not already finished the commands are run. If the timeout period has finished the current set of instructions is disgarded. If the time is less than the time the command is scheduled to be run at the programs sleeps until time.
+
+	--> Error Reporting :
+		The board has functionality to self test critical components and
+		send diagnostic info to the PC.
+		The board keeps track of errors (missed actions)
+
+	--> Errors :
+		RTC battery down
+		Relay not opening
+
+	--> Development MileStones :
+		v0.0.1 - Respond to simple Queries from the computer such as :
+		         BoardInfo(full), RelayState(all), getlocaltime
+		v0.0.2 - Allow resetting local time
+		v0.1.0 - Hardcoded sequence of actions stored in uC memory
+		         At this stage actions are only absolute time, no relative
+				 time jumps or things
+		v0.1.1 - Hardcoded sequence of actions stored in external memory 
+		         chip
+		v0.2.0 - Add support for repetitive actions
+		v0.3.0 - Allow dynamic loading of commands over the USB/serial 
+		         connection
+
+---> Command File
+	--> Description:
+		the command file describes the state of the relays in time. It 
+		contains two parts : the first part is dedicated to absolute
+		time commands or commands that can be written as an absolute time
+		(eg. @10:12:00 relay1 on, after 12s relay1 off), the second contains
+		repetitive statements that would occupy to much memory if every
+		iteration had to be written as an absolute time.
+	
+	--> File Specification (absolute time commands):
+		The file is a series of '\n' terminated lines. Each line starts with
+		the full time in hhmmssDDMMYYYY where each field is a byte long. 
+		This block is followed by the commands to be run at that time each a
+		byte long. the first 6 bytes are the id of the relay whilst the last 
+		two bits are the action (11 = high, 00 = low, 10, 01 = toggle).
+	
+	--> File Specification (repetitive commands):
+		This file is also a series of '\n' terminated lines. Each line is 
+		composed of 4 fields : 
+			a start time : hhmmssDDMMYYYY
+			a repeat delay : hhmmssDDMMYYYY
+			a combined relayid/action field : 6 bits for the relay id, 2 for the action
+
+---> parsing the command file :
+	

@@ -1,0 +1,222 @@
+\hypertarget{classCommandFileParser}{
+\section{CommandFileParser Class Reference}
+\label{classCommandFileParser}\index{CommandFileParser@{CommandFileParser}}
+}
+
+
+A central place for checking the command file for errors.  
+
+
+
+
+{\ttfamily \#include $<$CommandFileParser.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCommandFileParser_aa24d02c473d9d3d01294f21358803298}{CommandFileParser} ()
+\item 
+\hyperlink{classCommandFileParser_a49b17ddf6521173d2e509cf9b01fe804}{CommandFileParser} (\hyperlink{classBoard}{Board} board)
+\item 
+bool \hyperlink{classCommandFileParser_a289cd79998c789e821349ae75a51e3b0}{parseSimpleLine} (std::string line)
+\item 
+\hypertarget{classCommandFileParser_a71fd840d693859f1ef4d72cd3af3c3dd}{
+void {\bfseries setBoard} (\hyperlink{classBoard}{Board} \_\-board)}
+\label{classCommandFileParser_a71fd840d693859f1ef4d72cd3af3c3dd}
+
+\item 
+bool \hyperlink{classCommandFileParser_ae4328cd139c99cbe1c985cacc86164d4}{isValidTime} (std::string time)
+\item 
+bool \hyperlink{classCommandFileParser_ae784b8bb47f68026ad28a77834ddeb4e}{isValidDate} (std::string date)
+\item 
+bool \hyperlink{classCommandFileParser_a571f105fedb8fb54270d2f88a6a45dfb}{isValidRelayID} (std::string id)
+\item 
+bool \hyperlink{classCommandFileParser_a58da750f1de1b279c1acdb2ae84b1554}{isValidAction} (std::string action)
+\item 
+std::string \hyperlink{classCommandFileParser_a5a7cf1aab6e18b15d1db4447b7d53ce4}{purgeWhitespace} (std::string \&line)
+\item 
+void \hyperlink{classCommandFileParser_ab86b5967059afc2da9f2afb68ff49c11}{addError} (const char $\ast$message, int type)
+\item 
+void \hyperlink{classCommandFileParser_ac3305230e99692571f579548b5cab1dc}{addWarning} (const char $\ast$message, int type)
+\item 
+\hypertarget{classCommandFileParser_a4ddcf92c995981dcb8f52c4f4f626265}{
+void {\bfseries clearErrors} ()}
+\label{classCommandFileParser_a4ddcf92c995981dcb8f52c4f4f626265}
+
+\item 
+\hypertarget{classCommandFileParser_a54fc502ee4c8a81efa8382f67a802c82}{
+void {\bfseries clearWarnings} ()}
+\label{classCommandFileParser_a54fc502ee4c8a81efa8382f67a802c82}
+
+\item 
+\hypertarget{classCommandFileParser_a5d6400b04f94897065d529d3c364b109}{
+std::list$<$ \hyperlink{classError}{Error} $>$ {\bfseries getErrors} ()}
+\label{classCommandFileParser_a5d6400b04f94897065d529d3c364b109}
+
+\item 
+\hypertarget{classCommandFileParser_a208f287f9c21208222e086a72c4855e2}{
+void {\bfseries printErrors} ()}
+\label{classCommandFileParser_a208f287f9c21208222e086a72c4855e2}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A central place for checking the command file for errors. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classCommandFileParser_aa24d02c473d9d3d01294f21358803298}{
+\index{CommandFileParser@{CommandFileParser}!CommandFileParser@{CommandFileParser}}
+\index{CommandFileParser@{CommandFileParser}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{CommandFileParser}]{\setlength{\rightskip}{0pt plus 5cm}CommandFileParser::CommandFileParser (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_aa24d02c473d9d3d01294f21358803298}
+Constructor. \hypertarget{classCommandFileParser_a49b17ddf6521173d2e509cf9b01fe804}{
+\index{CommandFileParser@{CommandFileParser}!CommandFileParser@{CommandFileParser}}
+\index{CommandFileParser@{CommandFileParser}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{CommandFileParser}]{\setlength{\rightskip}{0pt plus 5cm}CommandFileParser::CommandFileParser (
+\begin{DoxyParamCaption}
+\item[{{\bf Board}}]{board}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_a49b17ddf6521173d2e509cf9b01fe804}
+Constructor. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classCommandFileParser_ab86b5967059afc2da9f2afb68ff49c11}{
+\index{CommandFileParser@{CommandFileParser}!addError@{addError}}
+\index{addError@{addError}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{addError}]{\setlength{\rightskip}{0pt plus 5cm}void CommandFileParser::addError (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{message, }
+\item[{int}]{type}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_ab86b5967059afc2da9f2afb68ff49c11}
+Add an \hyperlink{classError}{Error} to the error list. 
+\begin{DoxyParams}{Parameters}
+{\em message} & The error message \\
+\hline
+{\em type} & The error type (see ERROR\_\-TYPE::TYPE) \\
+\hline
+\end{DoxyParams}
+\hypertarget{classCommandFileParser_ac3305230e99692571f579548b5cab1dc}{
+\index{CommandFileParser@{CommandFileParser}!addWarning@{addWarning}}
+\index{addWarning@{addWarning}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{addWarning}]{\setlength{\rightskip}{0pt plus 5cm}void CommandFileParser::addWarning (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{message, }
+\item[{int}]{type}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_ac3305230e99692571f579548b5cab1dc}
+Add a warning to the warnings list. 
+\begin{DoxyParams}{Parameters}
+{\em message} & The error message \\
+\hline
+{\em type} & The error type (see ERROR\_\-TYPE::TYPE) \\
+\hline
+\end{DoxyParams}
+\hypertarget{classCommandFileParser_a58da750f1de1b279c1acdb2ae84b1554}{
+\index{CommandFileParser@{CommandFileParser}!isValidAction@{isValidAction}}
+\index{isValidAction@{isValidAction}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{isValidAction}]{\setlength{\rightskip}{0pt plus 5cm}bool CommandFileParser::isValidAction (
+\begin{DoxyParamCaption}
+\item[{std::string}]{action}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_a58da750f1de1b279c1acdb2ae84b1554}
+Checks that the action passed as parameter is valid. Actions are on, off and toggle. they can be written in any case 
+\begin{DoxyParams}{Parameters}
+{\em action} & The string that will be parsed \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if the action is valid, false otherwise 
+\end{DoxyReturn}
+\hypertarget{classCommandFileParser_ae784b8bb47f68026ad28a77834ddeb4e}{
+\index{CommandFileParser@{CommandFileParser}!isValidDate@{isValidDate}}
+\index{isValidDate@{isValidDate}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{isValidDate}]{\setlength{\rightskip}{0pt plus 5cm}bool CommandFileParser::isValidDate (
+\begin{DoxyParamCaption}
+\item[{std::string}]{date}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_ae784b8bb47f68026ad28a77834ddeb4e}
+Reads a date in dd/mm/yyyy format and parses it for errors. If it finds any errors it writes them to the errors list (retrieve them with getErrors()). There is no guaratee that this function will find every error on it's first pass. For simplicity if the date is malformed the function quits before trying to understand the values. 
+\begin{DoxyParams}{Parameters}
+{\em date} & the date the function will parse \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if no errors where encountere, false if an errors was encountered. 
+\end{DoxyReturn}
+\hypertarget{classCommandFileParser_a571f105fedb8fb54270d2f88a6a45dfb}{
+\index{CommandFileParser@{CommandFileParser}!isValidRelayID@{isValidRelayID}}
+\index{isValidRelayID@{isValidRelayID}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{isValidRelayID}]{\setlength{\rightskip}{0pt plus 5cm}bool CommandFileParser::isValidRelayID (
+\begin{DoxyParamCaption}
+\item[{std::string}]{id}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_a571f105fedb8fb54270d2f88a6a45dfb}
+Checks that the id starts with r or R and that the rest of the string is a non negative number lower than the number of relays on the board \hypertarget{classCommandFileParser_ae4328cd139c99cbe1c985cacc86164d4}{
+\index{CommandFileParser@{CommandFileParser}!isValidTime@{isValidTime}}
+\index{isValidTime@{isValidTime}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{isValidTime}]{\setlength{\rightskip}{0pt plus 5cm}bool CommandFileParser::isValidTime (
+\begin{DoxyParamCaption}
+\item[{std::string}]{time}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_ae4328cd139c99cbe1c985cacc86164d4}
+Reads a time in hh:mm:ss format and parses it for errors. If it finds any errors it writes them to the errors list (retrieve them with getErrors()). There is no guaratee that this function will find every error on it's first pass. For simplicity if the time is malformed the function quits before trying to understand the values. 
+\begin{DoxyParams}{Parameters}
+{\em time} & the time the function will parse \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if no errors where encountere, false if an errors was encountered. 
+\end{DoxyReturn}
+\hypertarget{classCommandFileParser_a289cd79998c789e821349ae75a51e3b0}{
+\index{CommandFileParser@{CommandFileParser}!parseSimpleLine@{parseSimpleLine}}
+\index{parseSimpleLine@{parseSimpleLine}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{parseSimpleLine}]{\setlength{\rightskip}{0pt plus 5cm}bool CommandFileParser::parseSimpleLine (
+\begin{DoxyParamCaption}
+\item[{std::string}]{line}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_a289cd79998c789e821349ae75a51e3b0}
+Parse a simple line. Simple lines are not defined by complexity. A simple line is command line that has the following format : hh:mm:ss DD:MM:YYYY \mbox{[}relayid action\mbox{]} If an error occurs it will be written to the errors list. You can retrieve errors with getErrors() 
+\begin{DoxyParams}{Parameters}
+{\em line} & The line the function will attempt to parse \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if no errors were encountered, false otherwise 
+\end{DoxyReturn}
+\hypertarget{classCommandFileParser_a5a7cf1aab6e18b15d1db4447b7d53ce4}{
+\index{CommandFileParser@{CommandFileParser}!purgeWhitespace@{purgeWhitespace}}
+\index{purgeWhitespace@{purgeWhitespace}!CommandFileParser@{CommandFileParser}}
+\subsubsection[{purgeWhitespace}]{\setlength{\rightskip}{0pt plus 5cm}string CommandFileParser::purgeWhitespace (
+\begin{DoxyParamCaption}
+\item[{std::string \&}]{line}
+\end{DoxyParamCaption}
+)}}
+\label{classCommandFileParser_a5a7cf1aab6e18b15d1db4447b7d53ce4}
+Remove whitespace at the start of the string, at the end of the string and any duplicate spaces in the string 
+\begin{DoxyParams}{Parameters}
+{\em \&line} & a reference to the line that we are parsing \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the produced string. This is redundant as we are operating on a reference 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+CommandFileParser.h\item 
+CommandFileParser.cpp\end{DoxyCompactItemize}

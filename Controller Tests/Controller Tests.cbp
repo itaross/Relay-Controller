@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Controller Tests" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="Controller Lib/;" />
+		<Build>
+			<Target title="Release">
+				<Option output="bin/Release/Controller Tests" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DDEBUG_NO_SERIAL" />
+					<Add directory="/home/Thibaud/Programming/TestPit/UnitTest++/src" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="/home/Thibaud/Programming/TestPit/Deliv/Release/libUnitTest++.a" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="$exe_output" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="../Controller Lib/Board.cpp" />
+		<Unit filename="../Controller Lib/Board.h" />
+		<Unit filename="../Controller Lib/CommandFileParser.cpp" />
+		<Unit filename="../Controller Lib/CommandFileParser.h">
+			<Option virtualFolder="Controller Lib/" />
+		</Unit>
+		<Unit filename="../Controller Lib/Error.h" />
+		<Unit filename="BoardTests.cpp" />
+		<Unit filename="CommandFileParserTests.cpp" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project output_directory="docs" />
+				<doxyfile_build extract_all="1" />
+				<doxyfile_warnings warn_if_undocumented="1" />
+				<doxyfile_output />
+				<doxyfile_dot class_diagrams="1" />
+				<general />
+			</DoxyBlocks>
+			<envvars />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
