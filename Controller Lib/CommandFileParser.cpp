@@ -9,13 +9,14 @@
 using namespace std;
 /** Constructor. */
 CommandFileParser::CommandFileParser()
+	: _line(-1)
 {
     //ctor
 }
 
 /** Constructor. */
 CommandFileParser::CommandFileParser(Board board)
-	: _board (board)
+	: _line(-1), _board (board)
 {
 
 }
@@ -53,19 +54,41 @@ bool CommandFileParser::parseSimpleLine(string line)
 	bool errors = false;
 
 	purgeWhitespace(line); //strip duplicate spaces
-
-	if (line[line.size()] != ' ') line.erase(line.size(), 1);
+	if (line.empty())
+	{
+		addError("empty line", ERROR_TYPE::UNKNOWN);
+		return false;
+	}
+	//Not any more you don't -- HOUSTON, We have a problem ... what if the user is stupid enough to pass a way to short string that makes find() return npos very early on ? you didn't think about that did you ?
+	//if (line[line.size()] != ' ') line.erase(line.size(), 1);
 	unsigned int c = line.find_first_of(' ');
 	if (isValidTime(line.substr(0, c)) == false) errors = true;
 	line.erase(0, c + 1);
 
+	if (line.empty())
+	{
+		addError("Incomplete line. Missing date and commands", ERROR_TYPE::UNKNOWN);
+		return false;
+	}
+
 	c = line.find_first_of(' ');
+	if (c == string::npos) //the date is the last field on the line
+	{
+		addError("Incomplete line. No commnds", ERROR_TYPE::UNKNOWN);
+		isValidDate(line);
+		errors = true;
+	}
 	if(!isValidDate(line.substr(0, c))) errors = true;
 	line.erase(0, c + 1);
 
 	int i = 0;
 	while (1)
 	{
+		if (line.empty())
+		{
+			addError("No relay IDs or commands to parse.", ERROR_TYPE::UNKNOWN);
+			return false;
+		}
 		/* At this stage we should have at least 2 tokens seperated by a space. The first is the
 		 * relay id, the second is the action.
 		 * we look for the first space. if we find a space we have a relay id
@@ -75,9 +98,11 @@ bool CommandFileParser::parseSimpleLine(string line)
 		c = line.find_first_of(' ');       //look for the space
 		if (c == string::npos)             //if we couldn't find a space :
 		{
-			if(!isValidRelayID(line)) errors = true;            //Parse the relay id
+			isValidRelayID(line);    //Parse the relay id
+			//since we're returning an error at the end of the block we don't need to check the return value
 			//because we consider what is left of the string as the relay id we don't need any substr stuff
 			addError("Found relay ID without command", ERROR_TYPE::UNKNOWN); //add the error
+			errors = true;
 			break; //we are at the end of the line, nothing more to be done
 		}
 
@@ -116,9 +141,124 @@ bool CommandFileParser::parseSimpleLine(string line)
   * \param line The line the function will attempt to parse
   * \return true if no errors were reported, false otherwise
   */
-bool CommandFileParser::parseRepeatline(string line)
+//TODO : allow the user to not specify an empty date
+bool CommandFileParser::parseRepeatLine(string line)
 {
-	return false;
+	bool errors = false;
+
+	purgeWhitespace(line);
+	if (line.empty())
+	{
+		addError("empty line", ERROR_TYPE::UNKNOWN);
+		return false;
+	}
+
+	//date and time parsing
+	unsigned int c = line.find_first_of(' ');					 //get the first field (time)
+	if (isValidTime(line.substr(0, c)) == false) errors = true;//check it
+	line.erase(0, c + 1);										 //erase it from the string
+
+	if (line.empty())
+	{
+		addError("Incomplete line. Missing date, delay and commands", ERROR_TYPE::UNKNOWN);
+		return false;
+	}
+
+	c = line.find_first_of(' ');								 //get the second field (date)
+	if(!isValidDate(line.substr(0, c))) errors = true;	         //check it
+	line.erase(0, c + 1);										 //erase it from the string
+
+	if (line.empty())
+	{
+		addError("Incomplete line. Missing delay and commands", ERROR_TYPE::UNKNOWN);
+		return false;
+	}
+
+	c = line.find_first_of(' ');								 //get the third field (wait)
+	if(!isWait(line.substr(0, c))) errors = true;			     //check it
+	line.erase(0, c + 1);										 // erase it from the string
+
+	if (line.empty())
+	{
+		addError("Incomplete line. Missing delay and commands", ERROR_TYPE::UNKNOWN);
+		return false;
+	}
+
+	c = line.find_first_of(' ');								 //get the fourth field (delay - time)
+	if(!isValidTime(line.substr(0, c))) errors = true;			 //check it
+	line.erase(0, c + 1);										 // erase it from the string
+
+	if (line.empty())
+	{
+		addError("Incomplete line. Line contains no commands and delay is malformed. if your delay is less than a day you can write 00/00/0000 for the date delay.", ERROR_TYPE::UNKNOWN);
+		return false;
+	}
+
+	c = line.find_first_of(' ');								 //get the fith field (delay - date)
+	if(!isValidDate(line.substr(0, c), true)) errors = true;			 //check it
+	line.erase(0, c + 1);										 // erase it from the string
+
+	if (line.empty())
+	{
+		addError("Incomplete line. Line contains no commands.", ERROR_TYPE::UNKNOWN);
+		return false;
+	}
+
+	//we have now parsed the fixed part of the command
+	// now we only have to take care of the variable length section
+	int i = 0;
+	while (1)
+	{
+		if (line.empty())
+		{
+			addError("No relay IDs or commands to parse.", ERROR_TYPE::UNKNOWN);
+			return false;
+		}
+		/* At this stage we should have at least 2 tokens seperated by a space. The first is the
+		 * relay id, the second is the action.
+		 * we look for the first space. if we find a space we have a relay id
+		 *								if we don't find a space we parse the first part of the string
+		 *									as a relay id and then exit.
+		 */
+		c = line.find_first_of(' ');       //look for the space
+		if (c == string::npos)             //if we couldn't find a space :
+		{
+			isValidRelayID(line);    //Parse the relay id
+			//since we're returning an error at the end of the block we don't need to check the return value
+			//because we consider what is left of the string as the relay id we don't need any substr stuff
+			addError("Found relay ID without command", ERROR_TYPE::UNKNOWN); //add the error
+			errors = true;
+			break; //we are at the end of the line, nothing more to be done
+		}
+
+		/* i serves as a counter, if we never increment i that means that we exited the loop just above
+		 * after checking c == npos, If i == 0 at the end of the loop we kmow that there where no
+		 * commands in the line
+		 */
+		i++;
+
+		//c != npos --> We found a space. We have at least 2 tokens in our line left
+		string relayid = line.substr(0, c);
+		line.erase(0, c + 1); //erase from line what we just put into relayid and erase the space
+		if (!isValidRelayID(relayid)) errors = true;
+
+		//we parsed the relay ID. If we are here we have at least one token left in the string
+		c = line.find_first_of(' ');
+		if (c == string::npos) //we're at the end of the line, we parse the rest of the line as the token and exit
+		{
+			if(!isValidAction(line)) errors = true;
+			break;
+		}
+
+		//we have more than one token left, read until next space and parse that as the token
+		if (!isValidAction(line.substr(0, c))) errors = true;
+		line.erase(0, c + 1);
+	}
+
+	if (i == 0)
+		addWarning("line contained no commands", ERROR_TYPE::UNKNOWN);
+
+	return !errors;
 }
 
 
@@ -197,7 +337,9 @@ bool CommandFileParser::isValidTime(string time)
   * \return true if no errors where encountere,
   *         false if an errors was encountered.
   */
-bool CommandFileParser::isValidDate(string date)
+//TODO :  remove necessity that dates be 10 chars long
+
+bool CommandFileParser::isValidDate(string date, bool accept_null_dates)
 {
 	bool errors = false;
 	int day, month, year;
@@ -256,6 +398,12 @@ bool CommandFileParser::isValidDate(string date)
 	if (month > 12)
 	{
 		addError("Not a valid date. A year only contains 12 months", ERROR_TYPE::DATE);
+		errors = true;
+	}
+
+	if (!accept_null_dates && (day == 0 || month == 0 || year == 0))
+	{
+		addError("This date cannot contain null fields", ERROR_TYPE::DATE);
 		errors = true;
 	}
 
@@ -342,6 +490,21 @@ bool CommandFileParser::isValidAction(string action)
 	}
 }
 
+bool CommandFileParser::isWait(string s)
+{
+	string s_transformed;
+	s_transformed.resize(s.size());
+
+	transform(s.begin(), s.end(), s_transformed.begin(), ::tolower);
+	if (s_transformed != "wait")
+	{
+		string error_message = "expected \2wai\2 as block 3, found : " + s;
+		addError(error_message.c_str(), ERROR_TYPE::UNKNOWN);
+		return false;
+	}
+	return true;
+}
+
 /** Remove whitespace at the start of the string, at the end of the string and any duplicate spaces
   * in the string
   * \param &line a reference to the line that we are parsing
@@ -395,7 +558,7 @@ void CommandFileParser::addWarning(const char* message, int type)
 void CommandFileParser::printErrors()
 {
 	for (list<Error>::iterator it = _errors.begin() ; it != _errors.end() ; it++)
-		cout << "ERROR : " << *it << endl;
+		cerr << "ERROR : " << *it << endl;
 }
 
 void CommandFileParser::clearErrors()

@@ -1,0 +1,33 @@
+# depslib dependency file v1.0
+1300213480 source:/home/Thibaud/Programming/RelayController/Interpreter/ShellMode/main.cpp
+	<iostream>
+	<luabind/luabind.hpp>
+	<lua.h>
+
+1299529189 source:/home/Thibaud/Programming/RelayController/Controller Lib/Board.cpp
+	<cstdio>
+	<iostream>
+	"Board.h"
+
+1299608777 /home/Thibaud/Programming/RelayController/Controller Lib/Board.h
+	<string>
+	<ctime>
+
+1299791657 source:/home/Thibaud/Programming/RelayController/Controller Lib/CommandFileParser.cpp
+	<cstring>
+	<ctime>
+	<sstream>
+	<algorithm>
+	"CommandFileParser.h"
+
+1299749273 /home/Thibaud/Programming/RelayController/Controller Lib/CommandFileParser.h
+	<fstream>
+	<list>
+	<string>
+	"Board.h"
+	"Error.h"
+
+1299779876 /home/Thibaud/Programming/RelayController/Controller Lib/Error.h
+	<iostream>
+	<cstdio>
+

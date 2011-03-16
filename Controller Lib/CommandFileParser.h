@@ -24,9 +24,10 @@ class CommandFileParser
         void setBoard(Board _board);
 
         bool isValidTime(std::string time);
-        bool isValidDate(std::string date);
+        bool isValidDate(std::string date, bool accept_null_dates = false);
         bool isValidRelayID(std::string id);
         bool isValidAction(std::string action);
+        bool isWait(std::string s);
 
         std::string purgeWhitespace(std::string &line);
 

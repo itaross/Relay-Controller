@@ -1,0 +1,4 @@
+# Test file for command line parser
+# When parsing this file we should encounter an invalid time error (minutes)
+
+1:63:00 12/06/2011 r1 on

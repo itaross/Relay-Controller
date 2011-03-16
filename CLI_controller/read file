@@ -1,0 +1,21 @@
+Command Files :
+	2 sections : Simple commands
+				 Repeat commands
+
+Human readable version 10:13:00 24/12/2011 r11 on
+                       10:13:00 24/12/2011 r11 off
+                       10:13:00 24/12/2011 r11 toggle
+
+					   start 10:13:00 24/12/2011 wait 1:00:00 r10 toggle
+					   start 10:13:00 24/12/2011 wait 1:00:00 10/00/0000 r10 toggle
+
+optimised version      date is compiled into 6 bytes
+					   relay ID and command are compressed into one byte
+						11 - on; 00 - off; 10 or 01 - toggle
+
+Checking the line : figure out if we are reading simple or repeat line -- Done
+					read the date
+					figure out if it is a valid date
+					read the commands
+					figure out if the relay ids are possible
+					check that the command is possible (real word)

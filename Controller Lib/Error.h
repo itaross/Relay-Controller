@@ -8,7 +8,6 @@ class Error
 {
 	friend std::ostream& operator<<(std::ostream &output, const Error &e)
 	{
-		output << "ERROR : ";
 		if (e._line != -1) //if line is -1 no line was specified
 		{				  //if a line was specified we want to print the line number
 			char buff[10];

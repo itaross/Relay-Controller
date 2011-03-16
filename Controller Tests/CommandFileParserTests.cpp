@@ -7,6 +7,8 @@
 #include <iostream>
 using namespace std;
 
+//check the errors that are effectively produced by the tests
+
 namespace
 {
 SUITE(CommandFileParserTests_isValidTime)
@@ -14,7 +16,6 @@ SUITE(CommandFileParserTests_isValidTime)
 	TEST(realTime)
 	{
 		CommandFileParser p;
-		p.printErrors();
 		CHECK_EQUAL(true, p.isValidTime("10:15:45"));
 	}
 
@@ -147,7 +148,7 @@ SUITE(CommandFileParserTests_isValidDate)
 		CHECK_EQUAL(false, p.isValidDate("10004/2011"));
 	}
 
-	TEST(tooManSlashes)
+	TEST(tooManySlashes)
 	{
 		CommandFileParser p;
 		CHECK_EQUAL(false, p.isValidDate("/2/04/2011"));
@@ -164,6 +165,19 @@ SUITE(CommandFileParserTests_isValidDate)
 		CommandFileParser p;
 		CHECK_EQUAL(false, p.isValidDate("012/0023/2001"));
 	}
+
+	TEST(NullDate_accept)
+	{
+		CommandFileParser p;
+		CHECK_EQUAL(true, p.isValidDate("00/00/0000", true));
+	}
+
+	TEST(NullDate_refuse)
+	{
+		CommandFileParser p;
+		CHECK_EQUAL(false, p.isValidDate("00/00/0000", false));
+	}
+
 }
 
 SUITE(CommandFileParserTests_isValidRelayID)
@@ -313,6 +327,21 @@ SUITE(CommandFileParserTests_purgeWhitespace)
 	}
 }
 
+SUITE(CommandFileParserTests_isWait)
+{
+	TEST(valid)
+	{
+		CommandFileParser p;
+		CHECK_EQUAL(true, p.isWait("WaiT"));
+	}
+
+	TEST(errored)
+	{
+		CommandFileParser p;
+		CHECK_EQUAL(false, p.isWait("notWait"));
+	}
+}
+
 
 SUITE (CommandFileParserTests_parseSimpleLine)
 {
@@ -335,6 +364,41 @@ SUITE (CommandFileParserTests_parseSimpleLine)
 		Board b;
 		CommandFileParser p(b);
 		CHECK_EQUAL(true, p.parseSimpleLine("10:40:20 11/10/2012 r7 on r9 toggle r10 off"));
+	}
+
+	TEST(onlyTime)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseSimpleLine("10:40:20 "));
+	}
+
+	TEST(empty)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseSimpleLine("   "));
+	}
+
+	TEST(noCommands)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseSimpleLine("10:40:20 11/10/2012"));
+	}
+
+	TEST(ridNoCommands)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseSimpleLine("10:40:20 11/10/2012 r4"));
+	}
+
+	TEST(ridCommandrid)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseSimpleLine("10:40:20 11/10/2012 r7 on r8"));
 	}
 
 	TEST(MultipleNonIdenticalCommandsErrorOnCommand2)
@@ -386,8 +450,119 @@ SUITE(CommandFileParserTests_parseRepeatLine)
 	{
 		Board b;
 		CommandFileParser p(b);
-		CHECK_EQUAL(true, p.parseRepeatLine("10:40:20 11/10/2012 wait 02:10: r7 "))
-		//isnulldate
+		CHECK_EQUAL(true, p.parseRepeatLine("10:40:20 11/10/2012 wait 02:10:34 01/08/2000 r7 on"));
+	}
+
+	TEST(validLine_nullDate)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(true, p.parseRepeatLine("10:40:20 11/10/2012 wait 02:10:20 00/00/0000 r7 on"));
+	}
+
+	TEST(dateError)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/13/2012 wait 02:10:34 01/08/2000 r7 on"));
+	}
+
+	TEST(TimeError)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:70:20 11/10/2012 wait 02:10:34 01/08/2000 r7 on"));
+	}
+
+	TEST(delay_dateError)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait 02:10:34 40/08/2000 r7 on"));
+	}
+
+	TEST(delay_timeError)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait 30:10:34 01/08/2000 r7 on"));
+	}
+
+	TEST(false_command)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait 20:10:34 01/08/2000 r7 not"));
+	}
+
+	TEST(relayidtoohigh)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait 20:10:34 01/08/2000 r80 on"));
+	}
+
+	TEST(onlytime)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20"));
+	}
+
+	TEST(nothingAfterDate)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012"));
+	}
+
+	TEST(nothingAfterWait)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait"));
+	}
+
+	TEST(nothingAfterdelayTime)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait 20:10:34"));
+	}
+
+	TEST(nothingAfterDelayDate)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait 20:10:34 01/08/2000"));
+	}
+
+	TEST(nothingAfterRelayID)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait 20:10:34 01/08/2000 r7"));
+	}
+
+	TEST(multipleCommands)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(true, p.parseRepeatLine("10:40:20 11/10/2012 wait 20:10:34 01/08/2000 r7 on r8 off"));
+	}
+
+	TEST(multiplieCommands_1WrongAction)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait 20:10:34 01/08/2000 r7 on r8 toog"));
+	}
+
+	TEST(multipleCommands_missingAction)
+	{
+		Board b;
+		CommandFileParser p(b);
+		CHECK_EQUAL(false, p.parseRepeatLine("10:40:20 11/10/2012 wait 20:10:34 01/08/2000 r7 on r8"));
 	}
 }
 }
