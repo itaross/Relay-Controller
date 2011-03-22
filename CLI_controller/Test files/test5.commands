@@ -1,5 +1,0 @@
-# Test file for command line parser
-# When parsing this file we should encounter an invalid date error (days)
-# month 04 is april - 30 days max
-
-7:32:00 31/04/2011 r1 on
