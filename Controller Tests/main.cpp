@@ -1,6 +1,5 @@
 
 #define DEBUG
-#define RUN_SINGLE_TEST
 
 #ifdef RUN_SINGLE_TEST
 	#define TEST_TO_RUN_SUITE "CommandFileParserTests_parseRepeatLine"
@@ -22,7 +21,7 @@ bool isTestToBeRun(const UnitTest::Test* test)
 		&& test->m_details.testName == TEST_TO_RUN_NAME)
 		return true;
 	else
-		return true;
+		return false;
 #else
 	return true;
 #endif
