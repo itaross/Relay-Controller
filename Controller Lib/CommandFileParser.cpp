@@ -261,6 +261,59 @@ bool CommandFileParser::parseRepeatLine(string line)
 	return !errors;
 }
 
+/***********************************************************************************
+ **            Line Compiling
+ **********************************************************************************/
+
+/** Build a previously parsed line and inserts it into the commands list at the apropriate
+  * location
+  * \param
+  * \return
+  */
+bool CommandFileParser::buildSimpleLine(string line)
+{
+	uint8_t* command[256];
+	/* If the line is correctly formed (which it should if the frontend developper is not brain dead
+	* and read the comment just above this one) we know that the entire date field is the text before
+	* the second space character. A generic line has the following format :
+	*          10:40:20 11/10/2012 r7 on
+	*                             ^
+	*                          char - 20
+	*/
+	//FIXME : This is a memory leak ...
+	uint8_t date* = compileDateTime(line.substr(0, 19).c_str());
+	line.erase(0, 20);
+
+	/* The rest of the line is now a sequence of relay ids and actions */
+	while (!line.empty())
+	{
+		int found = line.find(' ');
+		int rid = line.substr(0, found);
+		line.erase(0, found);
+
+		found = line.find(' ');
+		int action = line.substr(0, found);
+		line.erase(0, found);
+
+		uint8_t rid = compileRidAction(rid, action);
+	}
+
+	/* Now we only need to find where to insert the command in the list */
+	if (_command_file_simple_lines.empty())
+		_command_file_simple_lines.push_back(command);
+
+
+}
+
+/** Build a previously parsed line and inserts it into the commands list at the apropriate
+  * location
+  * \param
+  * \return
+  */
+bool buildRepeatLine(string line)
+{
+
+}
 
 /***********************************************************************************
  **            Date and Time checking
@@ -271,8 +324,7 @@ bool CommandFileParser::parseRepeatLine(string line)
   * find every error on it's first pass. For simplicity if the time is malformed the function quits
   * before trying to understand the values.
   * \param time the time the function will parse
-  * \return true if no errors where encountere,
-  *         false if an errors was encountered.
+  * \return true if no errors where encountered, false otherwise
   */
 bool CommandFileParser::isValidTime(string time)
 {
@@ -334,8 +386,7 @@ bool CommandFileParser::isValidTime(string time)
   * find every error on it's first pass. For simplicity if the date is malformed the function quits
   * before trying to understand the values.
   * \param date the date the function will parse
-  * \return true if no errors where encountere,
-  *         false if an errors was encountered.
+  * \return true if no errors where encountered, false otherwise
   */
 //TODO :  remove necessity that dates be 10 chars long
 
@@ -417,6 +468,8 @@ bool CommandFileParser::isValidDate(string date, bool accept_null_dates)
 
 /** Checks that the id starts with r or R and that the rest of the string is a non negative number
   * lower than the number of relays on the board
+  * \param id The relay id to check
+  * \return True if the relay id is valdi, false otherwise
   */
 bool CommandFileParser::isValidRelayID(string id)
 {
@@ -469,8 +522,8 @@ bool CommandFileParser::isValidRelayID(string id)
 	return true;
 }
 
-/** Checks that the action passed as parameter is valid. Actions are on, off and toggle.
-  * they can be written in any case
+/** Checks that the action passed as parameter is valid. Actions are "on", "off" and "toggle".
+  * The check is case insensitive
   * \param action The string that will be parsed
   * \return true if the action is valid, false otherwise
   */
@@ -490,6 +543,10 @@ bool CommandFileParser::isValidAction(string action)
 	}
 }
 
+/** Check that the string is the text "wait". The check is case insensitive
+  * \param s The string that will be tested
+  * \return True if the string is "wait", false otherwise
+  */
 bool CommandFileParser::isWait(string s)
 {
 	string s_transformed;
@@ -528,6 +585,41 @@ string CommandFileParser::purgeWhitespace(string &line)
 }
 
 /***********************************************************************************
+ **            Compilation Functions
+ **********************************************************************************/
+
+/** Compiles the Date and TIme into 6 bytes.
+  * This function does no error checking ! All input should be checked by the caller
+  * (se CommandFileParser::isValidDate and CommandFileParser::isValidTime). To achieve this
+  * each item in the time and date is shoved into a single byte. The only exception is the date
+  * 2000 > 512 so we measure year in years since 2000
+  * \param text A string containing only the date and time
+  * \return An array containing the 6 bytes of the compiled field
+  */
+const uint8_t* CommandFileParser::compileDateTime(char* text)
+{
+	int hour, minute, second, year, month, day;
+}
+
+/** Compiles the relay id and action into a single byte.
+  * This function does no error checking whatsoever ! all input should be checked by the caller.
+  * To be able to compile the 2 pieces of information into a byte we suppose that the relay id
+  * is less than 65 (max 64).
+  * \param rid The relay id
+  * \param action
+  * \return A single byte containing the relay id and the action
+  */
+uint8_t CommandFileParser::compileRidAction(int rid, int action)
+{
+	/* We cast the id into an int and shift it 2 bits left.
+	 * At this stage the rightmost 2 bits are 0
+	 * We just need to OR them with the action in binary form to produce the finished byte
+	 */
+	uint8_t result = (((unit8_t) rid) << 2) | ((action ==  ACTION::ON) 0b00000011 : 0b00000010);
+	return result;
+}
+
+/***********************************************************************************
  **            Error and Warning management
  **********************************************************************************/
 
@@ -555,17 +647,23 @@ void CommandFileParser::addWarning(const char* message, int type)
 		_warnings.push_back(Error(message, type, _line));
 }
 
+/** Print errors to stdout. DOes not clear errors.
+  */
 void CommandFileParser::printErrors()
 {
 	for (list<Error>::iterator it = _errors.begin() ; it != _errors.end() ; it++)
 		cerr << "ERROR : " << *it << endl;
 }
 
+/** Clears all errors.
+  */
 void CommandFileParser::clearErrors()
 {
 	_errors.clear();
 }
 
+/** Clears all warnings.
+  */
 void CommandFileParser::clearWarnings()
 {
 	_warnings.clear();
