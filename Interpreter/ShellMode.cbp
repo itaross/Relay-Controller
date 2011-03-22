@@ -34,7 +34,8 @@
 		<Unit filename="../Controller Lib/CommandFileParser.cpp" />
 		<Unit filename="../Controller Lib/CommandFileParser.h" />
 		<Unit filename="../Controller Lib/Error.h" />
-		<Unit filename="BoardBindings.cpp" />
+		<Unit filename="../Controller Lib/ShowDefines.hpp" />
+		<Unit filename="Bindings.cpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="scripts/board.lua" />
 		<Unit filename="scripts/init.lua" />
